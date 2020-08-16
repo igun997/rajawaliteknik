@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'title' => 'Donasi',
+    'title' => 'Inventory',
     'title_prefix' => '',
     'title_postfix' => '',
 
@@ -45,12 +45,12 @@ return [
     |
     */
 
-    'logo' => 'Rumaisa Center',
+    'logo' => 'Rajawali Teknik',
     'logo_img' => 'logo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
-    'logo_img_alt' => 'Rumaisa Center',
+    'logo_img_alt' => 'Rajawali Teknik',
 
     /*
     |--------------------------------------------------------------------------
@@ -194,11 +194,11 @@ return [
 
     'login_url' => 'login',
 
-    'register_url' => 'register',
+    'register_url' => false,
 
-    'password_reset_url' => 'password/reset',
+    'password_reset_url' =>  false,
 
-    'password_email_url' => 'password/email',
+    'password_email_url' => false,
 
     'profile_url' => false,
 
@@ -373,7 +373,7 @@ return [
         ],
         [
             'name' => 'Select2',
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
@@ -399,17 +399,6 @@ return [
             ],
         ],
         [
-            'name' => 'Sweetalert2',
-            'active' => false,
-            'files' => [
-                [
-                    'type' => 'js',
-                    'asset' => false,
-                    'location' => '//cdn.jsdelivr.net/npm/sweetalert2@8',
-                ],
-            ],
-        ],
-        [
             'name' => 'Pace',
             'active' => false,
             'files' => [
@@ -422,6 +411,21 @@ return [
                     'type' => 'js',
                     'asset' => false,
                     'location' => '//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js',
+                ],
+            ],
+        ],[
+            'name' => 'Toastr',
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'css',
+                    'asset' => false,
+                    'location' => '//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => false,
+                    'location' => '//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js',
                 ],
             ],
         ],

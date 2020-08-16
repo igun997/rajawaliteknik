@@ -1,45 +1,60 @@
-@extends('adminlte::page')
+@extends('adminlte::auth.login')
+@section('auth_body')
+    <form action="{{route("login.post")}}" method="post">
+        {{ csrf_field() }}
 
-@section('title', $title)
-
-@section('content_header')
-    <h1>Login Page</h1>
-@stop
-
-@section('content')
-    <div class="row">
-        <div class="col-md-6 offset-3">
-
-            <div class="card card-default">
-                @include("message")
-                <form role="form" action="{{route("login")}}" method="post">
-                    <div class="card-body">
-                        @csrf
-                        <div class="form-group">
-                            <label >Username</label>
-                            <input type="text" class="form-control" name="username" placeholder="Username">
-                        </div>
-                        <div class="form-group">
-                            <label >Password</label>
-                            <input type="password" class="form-control" name="password" placeholder="Username">
-                        </div>
-                    </div>
-                    <!-- /.card-body -->
-
-                    <div class="card-footer">
-                        <button type="submit" class="btn btn-primary">Login</button>
-                    </div>
-                </form>
+        {{-- Email field --}}
+        <div class="input-group mb-3">
+            <input type="email" name="email" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
+                   value="{{ old('email') }}" placeholder="{{ __('adminlte::adminlte.email') }}" autofocus>
+            <div class="input-group-append">
+                <div class="input-group-text">
+                    <span class="fas fa-envelope {{ config('adminlte.classes_auth_icon', '') }}"></span>
+                </div>
             </div>
-
+            @if($errors->has('email'))
+                <div class="invalid-feedback">
+                    <strong>{{ $errors->first('email') }}</strong>
+                </div>
+            @endif
         </div>
-    </div>
+
+        {{-- Password field --}}
+        <div class="input-group mb-3">
+            <input type="password" name="password" class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
+                   placeholder="{{ __('adminlte::adminlte.password') }}">
+            <div class="input-group-append">
+                <div class="input-group-text">
+                    <span class="fas fa-lock {{ config('adminlte.classes_auth_icon', '') }}"></span>
+                </div>
+            </div>
+            @if($errors->has('password'))
+                <div class="invalid-feedback">
+                    <strong>{{ $errors->first('password') }}</strong>
+                </div>
+            @endif
+        </div>
+
+        {{-- Login field --}}
+        <div class="row">
+            <div class="col-7">
+                <div class="icheck-primary">
+                    <input type="checkbox" name="remember" id="remember">
+                    <label for="remember">{{ __('adminlte::adminlte.remember_me') }}</label>
+                </div>
+            </div>
+            <div class="col-5">
+                <button type=submit class="btn btn-block {{ config('adminlte.classes_auth_btn', 'btn-flat btn-primary') }}">
+                    <span class="fas fa-sign-in-alt"></span>
+                    {{ __('adminlte::adminlte.sign_in') }}
+                </button>
+            </div>
+        </div>
+
+    </form>
 @stop
 
-@section('css')
-
+@section("js")
+@include("msg")
 @stop
 
-@section('js')
-
-@stop

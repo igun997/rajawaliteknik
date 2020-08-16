@@ -18,27 +18,41 @@ class Gateway
     {
         $level = session()->get("level");
         if ($level === NULL || $is_must === NULL){
-            Event::listen("JeroenNoten\LaravelAdminLte\Events\BuildingMenu",function ($e){
-                $e->menu->add([
-                   "text"=>"Login",
-                    "url"=>"login",
-                    "icon"=>"fa fa-sign-in-alt"
-                ]);
+            return  redirect("/")->withErrors(["msg"=>"Anda Belum Login"]);
 
-                $e->menu->add([
-                    "text"=>"Register",
-                    "url"=>"register",
-                    "icon"=>"fa fa-users"
-                ]);
-            });
-            return $next($request);
         }else{
+            $exploded = explode(",",$is_must);
+            if (in_array($level,$exploded)){
+                $is_must = $level;
+                Event::listen("JeroenNoten\LaravelAdminLte\Events\BuildingMenu",function ($e){
+                    $e->menu->add([
+                        "text"=>"Beranda",
+                        "url"=>"dashboard",
+                        "icon"=>"fa fa-home"
+                    ]);
 
+                });
+                if ($level == 0){
+
+                }elseif ($level == 1){
+
+                }elseif ($level == 2){
+
+                }
+                Event::listen("JeroenNoten\LaravelAdminLte\Events\BuildingMenu",function ($e){
+                    $e->menu->add([
+                        "text"=>"Logout",
+                        "url"=>"logout",
+                        "icon"=>"fa fa-sign-out-alt"
+                    ]);
+
+                });
+            }
 
             if ($level == $is_must){
                 return $next($request);
             }else{
-                return  redirect("/login")->withErrors(["msg"=>"Anda tidak memiliki akses ke halaman ini"]);
+                return  redirect("/")->withErrors(["msg"=>"Anda tidak memiliki akses ke halaman ini "]);
             }
         }
 
