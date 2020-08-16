@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get("/","Auth@index")->name("login");
 Route::post("/login","Auth@login")->name("login.post");
 
-Route::get("/dashboard","Dashboard@index")->middleware("gateway:0,1,2")->name("dashboard");
-Route::get("/logout","Dashboard@logout")->middleware("gateway:0,1,2")->name("logout");
+Route::get("/dashboard","Dashboard@index")->middleware("gateway:0|1|2")->name("dashboard");
+Route::get("/logout","Dashboard@logout")->middleware("gateway:0|1|2")->name("logout");
+
 
