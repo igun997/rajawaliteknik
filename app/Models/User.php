@@ -6,7 +6,6 @@
 
 namespace App\Models;
 
-use App\Casts\LevelAccount;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -16,13 +15,16 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * @property int $id
  * @property string $name
+ * @property string $email
  * @property string $username
  * @property string $password
  * @property int $level
  * @property bool $sub_level
+ * @property bool $status
  * @property Carbon $created_at
  * @property Carbon|null $updated_at
  * 
+ * @property Collection|OrderCashbon[] $order_cashbons
  * @property Collection|Order[] $orders
  * @property Collection|Product[] $products
  * @property Collection|Purchase[] $purchases
@@ -35,8 +37,9 @@ class User extends Model
 	protected $table = 'users';
 
 	protected $casts = [
-		'level' => LevelAccount::class,
-		'sub_level' => 'bool'
+		'level' => 'int',
+		'sub_level' => 'bool',
+		'status' => 'bool'
 	];
 
 	protected $hidden = [
@@ -45,13 +48,18 @@ class User extends Model
 
 	protected $fillable = [
 		'name',
+		'email',
 		'username',
 		'password',
-		'status',
-		'email',
 		'level',
-		'sub_level'
+		'sub_level',
+		'status'
 	];
+
+	public function order_cashbons()
+	{
+		return $this->hasMany(OrderCashbon::class);
+	}
 
 	public function orders()
 	{

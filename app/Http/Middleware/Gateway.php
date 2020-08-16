@@ -44,6 +44,11 @@ class Gateway
                 }elseif ($level == 1){
                     Event::listen("JeroenNoten\LaravelAdminLte\Events\BuildingMenu",function ($e){
                         $e->menu->add([
+                            "text"=>"Pelanggan",
+                            "url"=>"pelanggan",
+                            "icon"=>"fa fa-file"
+                        ]);
+                        $e->menu->add([
                             "text"=>"POS",
                             "url"=>"pos",
                             "icon"=>"fa fa-file"

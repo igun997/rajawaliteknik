@@ -6,7 +6,6 @@
 
 namespace App\Models;
 
-use App\Casts\StatusOrder;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -17,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string $invoice_number
  * @property int $status
+ * @property string|null $proof_docs
  * @property int $customer_id
  * @property int $user_id
  * @property Carbon $created_at
@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * @property Customer $customer
  * @property User $user
+ * @property Collection|OrderCashbon[] $order_cashbons
  * @property Collection|OrderItem[] $order_items
  * @property Collection|Transaction[] $transactions
  *
@@ -34,7 +35,7 @@ class Order extends Model
 	protected $table = 'orders';
 
 	protected $casts = [
-		'status' => StatusOrder::class,
+		'status' => 'int',
 		'customer_id' => 'int',
 		'user_id' => 'int'
 	];
@@ -55,6 +56,11 @@ class Order extends Model
 	public function user()
 	{
 		return $this->belongsTo(User::class);
+	}
+
+	public function order_cashbons()
+	{
+		return $this->hasMany(OrderCashbon::class);
 	}
 
 	public function order_items()

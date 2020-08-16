@@ -6,7 +6,6 @@
 
 namespace App\Models;
 
-use App\Casts\StatusPurchaseOrder;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -36,7 +35,7 @@ class Purchase extends Model
 
 	protected $casts = [
 		'supplier_id' => 'int',
-		'status' => StatusPurchaseOrder::class,
+		'status' => 'int',
 		'total' => 'float',
 		'user_id' => 'int'
 	];

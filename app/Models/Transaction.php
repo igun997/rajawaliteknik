@@ -6,8 +6,6 @@
 
 namespace App\Models;
 
-use App\Casts\RefType;
-use App\Casts\StatusTransaction;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * @property int $id
  * @property int $ref_type
- * @property int $ref_id
+ * @property int|null $ref_id
  * @property float $total
  * @property string $descriptions
  * @property int|null $user_id
@@ -36,12 +34,12 @@ class Transaction extends Model
 	protected $table = 'transactions';
 
 	protected $casts = [
-		'ref_type' => RefType::class,
+		'ref_type' => 'int',
 		'ref_id' => 'int',
 		'total' => 'float',
 		'user_id' => 'int',
 		'type' => 'int',
-		'status' => StatusTransaction::class
+		'status' => 'int'
 	];
 
 	protected $fillable = [

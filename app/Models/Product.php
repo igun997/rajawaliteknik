@@ -6,7 +6,6 @@
 
 namespace App\Models;
 
-use App\Casts\StatusProduct;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -39,7 +38,7 @@ class Product extends Model
 		'size_id' => 'int',
 		'price' => 'float',
 		'stock' => 'float',
-		'status' => StatusProduct::class,
+		'status' => 'bool',
 		'user_id' => 'int'
 	];
 

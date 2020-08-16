@@ -6,7 +6,6 @@
 
 namespace App\Models;
 
-use App\Casts\StatusCustomer;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -34,7 +33,7 @@ class Customer extends Model
 	protected $casts = [
 		'has_discount' => 'bool',
 		'percentage_discount' => 'float',
-		'status' => StatusCustomer::class
+		'status' => 'int'
 	];
 
 	protected $fillable = [
