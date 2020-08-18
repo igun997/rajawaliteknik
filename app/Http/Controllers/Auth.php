@@ -27,6 +27,7 @@ class Auth extends Controller
                 "name"=>$cek->first()->name,
                 "level"=>$cek->first()->level,
                 "sub_level"=>$cek->first()->sub_level,
+                "id"=>$cek->first()->id,
                 "username"=>$cek->first()->username,
                 "url"=>LevelAccount::redirect($cek->first()->level),
             ];
