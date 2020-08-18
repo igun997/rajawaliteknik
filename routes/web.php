@@ -16,12 +16,25 @@ use Illuminate\Support\Facades\Route;
 Route::get("/","Auth@index")->name("login");
 Route::post("/login","Auth@login")->name("login.post");
 
+//Modul Akun
+Route::middleware("gateway:0|1|2")->prefix("akun")->name("akun.")->group(function (){
+    Route::get("/","Akun@index")->name("list");
+    Route::get("/add","Akun@akun_add")->name("add");
+    Route::post("/add","Akun@akun_add_process")->name("add.process");
+    Route::get("/update/{id}","Akun@akun_update")->name("update");
+    Route::post("/update/{id}","Akun@akun_update_process")->name("update.process");
+});
+
+Route::middleware("gateway:1")->prefix("pelanggan")->name("pelanggan.")->group(function (){
+    Route::get("/","Pelanggan@index")->name("list");
+    Route::get("/add","Pelanggan@add")->name("add");
+    Route::post("/add","Pelanggan@add_process")->name("add.process");
+    Route::get("/update/{id}","Pelanggan@update")->name("update");
+    Route::post("/update/{id}","Pelanggan@update_process")->name("update.process");
+});
+
+
 Route::get("/dashboard","Dashboard@index")->middleware("gateway:0|1|2")->name("dashboard");
-Route::get("/akun","Akun@index")->middleware("gateway:0|1|2")->name("akun.list");
-Route::get("/akun/add","Akun@akun_add")->middleware("gateway:0|1|2")->name("akun.add");
-Route::post("/akun/add","Akun@akun_add_process")->middleware("gateway:0|1|2")->name("akun.add.process");
-Route::get("/akun/update/{id}","Akun@akun_update")->middleware("gateway:0|1|2")->name("akun.update");
-Route::post("/akun/update/{id}","Akun@akun_update_process")->middleware("gateway:0|1|2")->name("akun.update.process");
 Route::get("/logout","Dashboard@logout")->middleware("gateway:0|1|2")->name("logout");
 
 
