@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $size_id
  * @property float $price
  * @property float $stock
- * @property bool $status
+ * @property int $status
  * @property int $user_id
  * @property Carbon $created_at
  * @property Carbon|null $updated_at
@@ -38,7 +38,7 @@ class Product extends Model
 		'size_id' => 'int',
 		'price' => 'float',
 		'stock' => 'float',
-		'status' => 'bool',
+		'status' => 'int',
 		'user_id' => 'int'
 	];
 

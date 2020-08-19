@@ -19,6 +19,9 @@ class Gateway
         $level = session()->get("level");
         $sub_level = (session()->get("sub_level") == 1);
         if ($level === NULL || $is_must === NULL){
+            if ($request->ajax()){
+                return response()->json(["msg"=>"Anda Belum Login "],400);
+            }
             return  redirect("/")->withErrors(["msg"=>"Anda Belum Login"]);
 
         }else{
@@ -109,6 +112,9 @@ class Gateway
             if ($level == $is_must){
                 return $next($request);
             }else{
+                if ($request->ajax()){
+                    return response()->json(["msg"=>"Anda tidak memiliki akses ke halaman ini  "],400);
+                }
                 return  redirect("/")->withErrors(["msg"=>"Anda tidak memiliki akses ke halaman ini "]);
             }
         }

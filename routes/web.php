@@ -49,11 +49,16 @@ Route::middleware("gateway:1")->prefix("produk")->namespace("Produk")->name("pro
     });
 });
 //Modul POS > pos.
-Route::middleware("gateway:1")->prefix("pos")->namespace("Pos")->name("pos.")->group(function (){
+Route::middleware("gateway:1")->prefix("pos")->namespace("POS")->name("pos.")->group(function (){
     Route::get("/","Main@index")->name("menus");
     //Sub Module Size >  produk.util
     Route::prefix("api")->name("api.")->group(function (){
+        Route::get("/pelanggan","Api@list_pelanggan")->name("pelanggan");
+        Route::get("/produk","Api@list_produk")->name("produk");
 
+        Route::get("/cart","Api@list_cart")->name("cart.list");
+        Route::post("/cart/add","Api@add_cart")->name("cart.add");
+        Route::get("/cart/delete","Api@delete_cart")->name("cart.delete");
     });
 });
 //Modul Laporan
