@@ -44,6 +44,8 @@ class Order extends Model
 		'invoice_number',
 		'status',
 		'proof_docs',
+        'total',
+        'discount',
 		'additional_info',
 		'customer_id',
 		'user_id'

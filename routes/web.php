@@ -58,7 +58,10 @@ Route::middleware("gateway:1")->prefix("pos")->namespace("POS")->name("pos.")->g
 
         Route::get("/cart","Api@list_cart")->name("cart.list");
         Route::post("/cart/add","Api@add_cart")->name("cart.add");
-        Route::get("/cart/delete","Api@delete_cart")->name("cart.delete");
+        Route::post("/cart/discount","Api@discount_cart")->name("cart.discount");
+        Route::get("/cart/clear","Api@clear_cart")->name("cart.clear");
+        Route::post("/cart/delete","Api@delete_cart")->name("cart.delete");
+        Route::post("/cart/checkout","Api@checkout_cart")->name("cart.checkout");
     });
 });
 //Modul Laporan

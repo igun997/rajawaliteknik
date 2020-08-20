@@ -10,12 +10,14 @@
     <div class="row">
 
         <div class="col-8">
-            <div class="card" style="max-height: 30em">
+            <div class="card" style="max-height: 30em;overflow-y: scroll">
                 <div class="card-header">
-                    <div class="card-title">Data Produk <button class="btn btn-primary m-2" id="reload_penjualan" title="Refresh Data Produk"><li class="fa fa-spinner"></li></button></div>
+                    <div class="card-title">Data Produk <button class="btn btn-primary m-2" id="reload_produk" title="Refresh Data Produk"><li class="fa fa-spinner"></li></button></div>
                 </div>
                 <div class="card-body">
+                    <div class="row" id="listProduk">
 
+                    </div>
                 </div>
             </div>
         </div>
@@ -25,7 +27,7 @@
                     <div class="card-title">Form Penjualan <button class="btn btn-primary m-2" id="reload_penjualan" title="Refresh Form Penjualan"><li class="fa fa-spinner"></li></button></div>
                 </div>
                 <div class="card-body">
-                    <form action="">
+                    <form action="" method="post" onsubmit="return false">
                         <div class="form-group">
                             <label>Nama Pelanggan</label>
                             <select name="customer_id" class="form-control">
@@ -53,6 +55,10 @@
                                             <th colspan="3">Total</th>
                                             <th colspan="3" id="priceTotal">Rp. 0</th>
                                         </tr>
+                                        <tr>
+                                            <th colspan="2">Diskon</th>
+                                            <th colspan="4" id="diskon">-</th>
+                                        </tr>
                                     </tfoot>
                                 </table>
                             </div>
@@ -64,6 +70,12 @@
                                 <option value="Giro">Giro</option>
                                 <option value="Cashbon">Cashbon</option>
                             </select>
+                        </div>
+                        <div class="form-group" id="haveDiskon" style="text-align: center">
+                            <button class="btn btn-primary" id="setDiskon" type="submit">Tambahkan Diskon Member</button>
+                        </div>
+                        <div class="form-group" style="text-align: center">
+                            <button class="btn btn-success" type="submit">Simpan & Cetak Faktur</button>
                         </div>
                     </form>
                 </div>
@@ -80,6 +92,25 @@
     @include("msg")
     <script>
         list_cart();
+        list_pelanggan();
+        list_produk();
+        $("#reload_penjualan").on("click",function () {
+            console.log("Reload");
+            $.get("{{route("pos.api.cart.clear")}}",function () {
+                list_cart();
+                list_pelanggan();
+                $("form")[0].reset();
+                toastr.info("Reload Form Penjualan ...");
+            }).fail(function () {
+                toastr.error("Form Gagal Di Reload")
+            })
+
+        })
+        $("#reload_produk").on("click",function () {
+            console.log("Reload");
+            toastr.info("Reload Produk ...");
+            list_produk();
+        })
         function formatNumber(num) {
             return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
         }
@@ -103,9 +134,15 @@
                 });
                 $("#itemList").html(items.join(""));
                 $("#priceTotal").html("Rp. "+res.total);
-                $("#itemList").on("click",".delete",function () {
+                $("#diskon").html("");
+                $.each(res.discount,function (d,i) {
+                    $("#diskon").html(d);
+                })
+                $("#itemList").on("click",".delete",function (e) {
+                    e.preventDefault();
+                    $("#itemList").off("click");
                     let path = $(this).data("link");
-                    $.get(path,function (res) {
+                    $.post(path,function (res) {
                         list_cart();
                     }).fail(function () {
                         toastr.error("Koneksi Terputus");
@@ -116,6 +153,94 @@
             });
 
         }
+        function list_pelanggan() {
+            let instance = $("select[name=customer_id]");
+            instance.html("");
+            $.get("{{route("pos.api.pelanggan")}}",function (data) {
+                let items = [];
+                $.each(data.data,function(k,d){
+                    items.push("<option value='"+d.id+"'>"+d.name+"</option>");
+                });
+                instance.html(items.join(""));
+            })
+        }
+        function list_produk() {
+            $("#listProduk").html("");
+            const produk = function (data) {
+                let build = [
+                    '<div class="col-12 col-sm-8 col-md-6 col-lg-4">',
+                    '<div class="card">',
+                    '<div class="card-img-overlay d-flex justify-content-end">',
+                    '<a type="button" data-id="'+data.id+'"  class="card-link text-success add_to_cart">',
+                    '<i class="fas fa-shopping-cart"></i>',
+                    '</a>',
+                    '</div>',
+                    '<div class="card-body">',
+                    '<h4 class="card-title">'+data.name+'</h4>',
+                    '<div class="card-text ">',
+                    '<table class="table-bordered table mt-5">',
+                    '<tr>',
+                    '<th>Harga</th>',
+                    '<th>Stock</th>',
+                    '<th>Ukuran</th>',
+                    '</tr>',
+                    '<tr>',
+                    '<td class="text-green">'+formatNumber(data.price)+'</td>',
+                    '<td>'+((data.stock)?data.stock:'Pre Order')+'</td>',
+                    '<td>'+data.size_data.name+'</td>',
+                    '</tr>',
+                    '</table>',
+                    '</div>',
+                    '</div>',
+                    '</div>',
+                    '</div>',
+                ];
+                return build.join("");
+            };
+            $.get("{{route("pos.api.produk")}}",function (res) {
+                let items = [];
+                $.each(res.data,function (i,d) {
+                    items.push(produk(d));
+                })
+                $("#listProduk").html(items.join(""));
+                $("#listProduk").on("click",".add_to_cart",function (e) {
+                    e.preventDefault();
+                    id = $(this).data("id");
+                    $.post("{{route("pos.api.cart.add")}}",{product_id:id},function (res) {
+                        toastr.success(res.msg);
+                        location.reload();
+                    }).fail(function () {
+                        toastr.error("Terputus Dari Server");
+                    })
+                })
+            })
+        }
+        $("form").on("submit",function () {
+            let data = $(this).serializeArray();
+            console.log(data)
+            $.post("{{route("pos.api.cart.checkout")}}",data,function (r) {
+                toastr.success(r.msg);
+                setTimeout(function () {
+                    if(r.url !== ""){
+                        location.href = r.url;
+                    }else{
+                        location.reload();
+                    }
+                },500)
+
+            }).fail(function () {
+                toastr.error("Terputus Dengan Server");
+            })
+        })
+        $("#setDiskon").on("click",function () {
+            let id = $("select[name=customer_id]").val();
+            $.post("{{route("pos.api.cart.discount")}}",{customer_id:id},function (res) {
+                toastr.success(res.msg);
+                list_cart();
+            }).fail(function(){
+                toastr.error("Terputus Dengan Server");
+            })
+        })
     </script>
 @stop
 

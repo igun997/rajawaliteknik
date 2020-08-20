@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers\POS;
 
+use App\Casts\StatusOrder;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
+use Carbon\Carbon;
+use Darryldecode\Cart\CartCondition;
 use Illuminate\Http\Request;
 use Cart;
 class Api extends Controller
@@ -73,13 +78,13 @@ class Api extends Controller
     {
         $session = session()->get("id");
         $items = Cart::session($session)->getContent();
-        return response()->json(["data"=>$items,"total"=>Cart::getTotal()]);
+        return response()->json(["data"=>$items,"total"=>Cart::session($session)->getTotal(),"discount"=>Cart::session($session)->getConditions()]);
     }
 
     public function add_cart(Request $req)
     {
         $req->validate([
-            "product_id"=>"required|exist:product,id"
+            "product_id"=>"required|exists:products,id",
         ]);
 
         $session = session()->get("id");
@@ -88,10 +93,40 @@ class Api extends Controller
         return response()->json(["msg"=>"Sukses Di Tambahkan"]);
     }
 
+    public function clear_cart()
+    {
+        Cart::session(session()->get("id"))->clear();
+        Cart::session(session()->get("id"))->clearCartConditions();
+
+        return response()->json(["msg"=>"Cart Di Reset"]);
+    }
+
+    public function discount_cart(Request $req){
+        $req->validate([
+            "customer_id"=>"required|exists:customers,id",
+        ]);
+        $find = Customer::where(["id"=>$req->customer_id,"has_discount"=>1]);
+        if ($find->count() > 0){
+            $have = $find->first()->percentage_discount;
+            $condition = new CartCondition([
+                'name' => 'Diskon Pelanggan '.$have.'%',
+                'type' => 'promo',
+                'target' => 'total',
+                'value' => ($have*-1)."%",
+                'attributes' =>[]
+            ]);
+            Cart::session(session()->get("id"))->condition($condition);
+            return response()->json(["msg"=>'Diskon Pelanggan '.$have.'% Terapkan']);
+        }else{
+            return response()->json(["msg"=>"Tidak Memiliki Diskon"]);
+        }
+
+    }
+
     public function delete_cart(Request $req)
     {
         $req->validate([
-            "product_id"=>"required|exists:products ,id"
+            "product_id"=>"required|exists:products,id"
         ]);
 
         $session = session()->get("id");
@@ -99,6 +134,59 @@ class Api extends Controller
         $this->_remove($session,$id);
 
         return response()->json(["msg"=>"Sukses Di Hapus"]);
+    }
+
+    public function checkout_cart(Request $req)
+    {
+        $req->validate([
+            "customer_id"=>"required|exists:customers,id",
+        ]);
+        $data = $req->all();
+        $status = StatusOrder::CASHBON;
+        $user_id = session()->get("id");
+        $info = "Pembayaran Belum Lunas";
+        if ($data["additional_info"][0] !== "Cashbon"){
+            $info = "Pembayaran Lunas";
+            $status = StatusOrder::PAYMENT_CONFIRMED;
+        }
+        unset($data["additional_info"]);
+        $data["user_id"] = $user_id;
+        $data["status"] = $status;
+        $data["additional_info"] = $info;
+        $data["total"] = str_replace(",","",Cart::session($user_id)->getTotal());
+        $diskons = Cart::session($user_id)->getConditions();
+        foreach ($diskons as $index => $diskon) {
+            $data["discount"] = $diskon->parsedRawValue;
+        }
+        $num = Order::whereDate('created_at', Carbon::today())->count() + 1;
+        $data["invoice_number"] = "ORD/".date("d/m/Y")."/".str_pad($num,5,0,STR_PAD_LEFT);
+        $makeOrder = Order::create($data);
+        if ($makeOrder){
+            $ord_id = $makeOrder->id;
+            $lists = Cart::session($user_id)->getContent();
+            $makeItems = false;
+            foreach ($lists as $index => $list) {
+                $product = [
+                    "order_id"=>$ord_id,
+                    "product_id"=>$index,
+                    "qty"=>$list->quantity,
+                    "price"=>$list->price,
+                    "subtotal"=>($list->quantity*$list->price),
+                ];
+                $makeItems = OrderItem::create($product);
+            }
+            if ($makeItems){
+                Cart::session($user_id)->clear();
+                Cart::session($user_id)->clearCartConditions();
+                return  response()->json(["msg"=>"Order Telah Di Selesaikan","url"=>""]);
+            }else{
+                return Order::where(["id"=>$ord_id])->delete();
+            }
+        }
+
+        return  response()->json(["msg"=>"Gagal Checkout Cart"]);
+
+
     }
 
 }
