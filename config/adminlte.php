@@ -427,7 +427,17 @@ return [
                     'asset' => false,
                     'location' => '//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js',
                 ],
+            ]
+        ],[
+            'name' => 'BootboxJS',
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'js',
+                    'asset' => false,
+                    'location' => '//cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.4.0/bootbox.min.js',
+                ],
             ],
-        ],
+        ]
     ],
 ];

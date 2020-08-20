@@ -48,6 +48,24 @@ Route::middleware("gateway:1")->prefix("produk")->namespace("Produk")->name("pro
         Route::post("/update/{id}","Size@update_process")->name("update.process");
     });
 });
+//Modul Orders > orders.
+Route::middleware("gateway:1")->prefix("orders")->namespace("Orders")->name("orders.")->group(function (){
+    Route::get("/","Selling@index")->name("list");
+    Route::get("/update_status","Selling@update_status")->name("update_status");
+
+    Route::middleware("gateway:1")->prefix("print")->name("print.")->group(function (){
+        Route::get("invoice","Selling@print_invoice")->name("faktur");
+        Route::get("invoice/action","Selling@print_invoice_action")->name("faktur.action");
+        Route::get("shipping","Selling@print_shipping")->name("shipping");
+        Route::get("shipping/action","Selling@print_shipping_action")->name("shipping.action");
+    });
+    Route::middleware("gateway:1")->prefix("api")->name("api.")->group(function (){
+        Route::get("product","Selling@product_detail")->name("product");
+        Route::get("cashbon","Selling@cashbon_detail")->name("cashbon");
+        Route::post("cashbon","Selling@cashbon_create")->name("cashbon.create");
+    });
+
+});
 //Modul POS > pos.
 Route::middleware("gateway:1")->prefix("pos")->namespace("POS")->name("pos.")->group(function (){
     Route::get("/","Main@index")->name("menus");

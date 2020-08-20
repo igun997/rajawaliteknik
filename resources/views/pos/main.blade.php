@@ -72,7 +72,7 @@
                             </select>
                         </div>
                         <div class="form-group" id="haveDiskon" style="text-align: center">
-                            <button class="btn btn-primary" id="setDiskon" type="submit">Tambahkan Diskon Member</button>
+                            <button class="btn btn-primary" type="button" id="setDiskon" type="submit">Tambahkan Diskon Member</button>
                         </div>
                         <div class="form-group" style="text-align: center">
                             <button class="btn btn-success" type="submit">Simpan & Cetak Faktur</button>

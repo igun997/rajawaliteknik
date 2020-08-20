@@ -49,17 +49,22 @@ class Gateway
                         $e->menu->add([
                             "text"=>"Pelanggan",
                             "url"=>"pelanggan",
-                            "icon"=>"fa fa-file"
+                            "icon"=>"fa fa-users"
                         ]);
                         $e->menu->add([
                             "text"=>"POS",
                             "url"=>"pos",
-                            "icon"=>"fa fa-file"
+                            "icon"=>"fa fa-cart-plus "
+                        ]);
+                        $e->menu->add([
+                            "text"=>"Penjualan",
+                            "url"=>"orders",
+                            "icon"=>"fa fa-shopping-cart"
                         ]);
                         $e->menu->add([
                             "text"=>"Produk",
                             "url"=>"produk",
-                            "icon"=>"fa fa-file"
+                            "icon"=>"fa fa-sitemap"
                         ]);
                         $e->menu->add([
                             "text"=>"Laporan",
