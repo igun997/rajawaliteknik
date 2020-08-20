@@ -49,17 +49,17 @@ class StatusOrder implements CastsAttributes
         }elseif ($type == StatusOrder::PAYMENT_CONFIRMED){
             return "Pembayaran Di Konfirmasi";
         }elseif ($type == StatusOrder::PROCESSING){
-            return "Order Sedang Di Proses";
+            return "Pesanan Sedang Di Proses";
         }elseif ($type == StatusOrder::SHIPPING){
-            return "Sedang Dikirimkan";
+            return "Pesanan Sedang Dikirimkan";
         }elseif ($type == StatusOrder::SUCCESS){
-            return "Order Sukses";
+            return "Pesanan Sukses";
         }elseif ($type == StatusOrder::RETURNED){
-            return "Order Dikembalikan";
+            return "Pesanan Dikembalikan";
         }elseif ($type == StatusOrder::CANCELED){
-            return "Order Di Batalkan";
+            return "Pesanan Di Batalkan";
         }elseif ($type == StatusOrder::CASHBON){
-            return "Order Cashbon";
+            return "Pesanan Belum Lunas";
         }else{
             return  FALSE;
         }

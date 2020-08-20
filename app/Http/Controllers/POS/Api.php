@@ -146,7 +146,7 @@ class Api extends Controller
         $user_id = session()->get("id");
         $info = "Pembayaran Belum Lunas";
         if ($data["additional_info"][0] !== "Cashbon"){
-            $info = "Pembayaran Lunas";
+            $info = "Pembayaran Lunas Dengan Metode Pembayaran ".$data["additional_info"][0];
             $status = StatusOrder::PAYMENT_CONFIRMED;
         }
         unset($data["additional_info"]);
@@ -178,7 +178,7 @@ class Api extends Controller
             if ($makeItems){
                 Cart::session($user_id)->clear();
                 Cart::session($user_id)->clearCartConditions();
-                return  response()->json(["msg"=>"Order Telah Di Selesaikan","url"=>""]);
+                return  response()->json(["msg"=>"Order Telah Di Selesaikan","url"=>route("orders.print.faktur")."?order_id=$ord_id"]);
             }else{
                 return Order::where(["id"=>$ord_id])->delete();
             }

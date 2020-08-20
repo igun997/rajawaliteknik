@@ -222,6 +222,7 @@
                 toastr.success(r.msg);
                 setTimeout(function () {
                     if(r.url !== ""){
+                        list_cart();
                         location.href = r.url;
                     }else{
                         location.reload();

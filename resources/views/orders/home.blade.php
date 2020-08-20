@@ -84,6 +84,26 @@
         $("table").on("click",".print",function () {
             id = $(this).data("id");
             console.log("ID "+id);
+            var dialog = bootbox.dialog({
+                title: 'Cetak',
+                message: '<p align="center"><i class="fa fa-spin fa-spinner"></i> Loading...</p>'
+            });
+            dialog.init(function() {
+                setTimeout(function () {
+                    let body = [
+                        "<div class='row'>",
+                        "<div class='col-md-6'>",
+                        "<a href='{{route("orders.print.faktur")}}?order_id="+id+"' class='btn btn-primary btn-lg btn-block'>Nota Faktur</a>",
+                        "</div>",
+                        "<div class='col-md-6'>",
+                        "<a href='{{route("orders.print.shipping")}}?order_id="+id+"' class='btn btn-primary btn-lg btn-block'>Surat Jalan</a>",
+                        "</div>",
+                        "</div>",
+                    ];
+                    dialog.find(".bootbox-body").html(body.join(""));
+                }, 100);
+            });
+
         })
         $("table").on("click",".cashbon",function () {
             id = $(this).data("id");

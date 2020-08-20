@@ -9,7 +9,45 @@ use App\Models\Order;
 use App\Models\OrderCashbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
-
+use Konekt\PdfInvoice\InvoicePrinter;
+class InvoicePrinterOverride extends InvoicePrinter{
+    public function price($price)
+    {
+        $decimalPoint = $this->referenceformat[0];
+        $thousandSeparator = $this->referenceformat[1];
+        $alignment = isset($this->referenceformat[2]) ? strtolower($this->referenceformat[2]) : 'left';
+        $spaceBetweenCurrencyAndAmount = isset($this->referenceformat[3]) ? (bool) $this->referenceformat[3] : true;
+        $space = $spaceBetweenCurrencyAndAmount ? ' ' : '';
+        if ('right' == $alignment) {
+            return number_format($price, 2, $decimalPoint, $thousandSeparator).$space.$this->currency;
+        } else {
+            if (is_numeric($price)){
+                return $this->currency.$space.number_format($price, 2, $decimalPoint, $thousandSeparator);
+            }else{
+                return  "-";
+            }
+        }
+    }
+    public function forceToId()
+    {
+        $this->language = "ID";
+        $lang['number']   = 'No Faktur';
+        $lang['date']     = 'Tanggal';
+        $lang['time']     = 'Waktu';
+        $lang['due']      = 'Batas Waktu';
+        $lang['to']       = 'Kepada YTH';
+        $lang['from']     = 'Pembayaran Dari';
+        $lang['product']  = 'Produk';
+        $lang['qty']      = 'Jumlah';
+        $lang['price']    = 'Harga';
+        $lang['discount'] = 'Diskon';
+        $lang['vat']      = 'Pajak';
+        $lang['total']    = 'Total';
+        $lang['page']     = 'Halaman';
+        $lang['page_of']  = 'Dari';
+        $this->lang = $lang;
+    }
+}
 class Selling extends Controller
 {
 
@@ -101,19 +139,75 @@ class Selling extends Controller
         $req->validate([
             "order_id"=>"required|exists:orders,id"
         ]);
+        $find = Order::where(["id"=>$req->order_id])->first();
+        $invoice = new InvoicePrinterOverride("A5","Rp. ");
+        $invoice->forceToId();
+        /* Header settings */
+//        $invoice->setLogo("images/sample1.jpg");   //logo image path
+        $invoice->setColor("#000000");      // pdf color scheme
+        $invoice->setType("Nota Faktur");    // Invoice Type
+        $invoice->setReference($find->invoice_number);   // Reference
+        $invoice->setDate(date('d/m/Y',time()));   //Billing Date
+        $invoice->setFrom([
+            "Rajawali Teknik",
+            "alamat perusahaan"
+        ]);
+        $invoice->setTo([
+            $find->customer->name,
+            $find->customer->address
+        ]);
+        foreach ($find->order_items as $row){
+            $invoice->addItem($row->product()->first()->name,"Ukuran : ".$row->product()->first()->product_size()->first()->name,$row->qty,false,$row->price,false,$row->subtotal);
+        }
+
+        $invoice->addTotal("Subtotal",($find->total + $find->discount));
+        $invoice->addTotal("Diskon",($find->discount*-1));
+        $invoice->addTotal("Total",$find->total,false);
+
+        $invoice->addBadge(StatusOrder::lang($find->status));
+        $invoice->addTitle("Catatan Faktur");
+        $invoice->addParagraph($find->additional_info);
+        $invoice->render('invoice_'.time().'.pdf','D');
+
+
     }
 
-    public function print_invoice_action(Request $req)
+    public function print_shipping(Request $req)
     {
         $req->validate([
             "order_id"=>"required|exists:orders,id"
         ]);
-    }
-    public function shipping_invoice(Request $req)
-    {
-        $req->validate([
-            "order_id"=>"required|exists:orders,id"
+        $find = Order::where(["id"=>$req->order_id])->first();
+        $invoice = new InvoicePrinterOverride("A5","Rp. ");
+        $invoice->forceToId();
+        /* Header settings */
+//        $invoice->setLogo("images/sample1.jpg");   //logo image path
+        $invoice->setColor("#000000");      // pdf color scheme
+        $invoice->setType("Surat Jalan");    // Invoice Type
+        $invoice->setReference($find->invoice_number);
+        $invoice->setDate(date('d/m/Y',time()));   //Billing Date
+        $invoice->setFrom([
+            "Rajawali Teknik",
+            "alamat perusahaan"
         ]);
+        $invoice->setTo([
+            $find->customer->name,
+            $find->customer->address
+        ]);
+        foreach ($find->order_items as $row){
+            $invoice->addItem($row->product()->first()->name,"Ukuran : ".$row->product()->first()->product_size()->first()->name,$row->qty,false,"-",false,"-");
+        }
+
+
+        $invoice->addTitle("Catatan ");
+        $invoice->addParagraph("Nama Supir ...................");
+        $invoice->addParagraph("Plat Nomor ...................");
+        $invoice->addParagraph("Tanda Tangan Penerima");
+        $invoice->addParagraph("");
+        $invoice->addParagraph("");
+        $invoice->addParagraph("...................................");
+        $invoice->render('suratjalan_'.time().'.pdf','D');
+
     }
 
     public function shipping_invoice_action(Request $req)

@@ -117,6 +117,8 @@
       <path value="$PROJECT_DIR$/vendor/phpspec/prophecy" />
       <path value="$PROJECT_DIR$/vendor/bumbummen99/shoppingcart" />
       <path value="$PROJECT_DIR$/vendor/darryldecode/cart" />
+      <path value="$PROJECT_DIR$/vendor/konekt/pdf-invoice" />
+      <path value="$PROJECT_DIR$/vendor/setasign/fpdf" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="7.4" />

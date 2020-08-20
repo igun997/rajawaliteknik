@@ -55,9 +55,7 @@ Route::middleware("gateway:1")->prefix("orders")->namespace("Orders")->name("ord
 
     Route::middleware("gateway:1")->prefix("print")->name("print.")->group(function (){
         Route::get("invoice","Selling@print_invoice")->name("faktur");
-        Route::get("invoice/action","Selling@print_invoice_action")->name("faktur.action");
         Route::get("shipping","Selling@print_shipping")->name("shipping");
-        Route::get("shipping/action","Selling@print_shipping_action")->name("shipping.action");
     });
     Route::middleware("gateway:1")->prefix("api")->name("api.")->group(function (){
         Route::get("product","Selling@product_detail")->name("product");
