@@ -9,6 +9,7 @@ class RefType implements CastsAttributes
 
     const ORDER = 0;
     const PURCHASE = 1;
+    const CASHBON = 2;
     /**
      * Cast the given value.
      *

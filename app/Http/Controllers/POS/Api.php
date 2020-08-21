@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers\POS;
 
+use App\Casts\RefType;
 use App\Casts\StatusOrder;
+use App\Casts\StatusTransaction;
+use App\Casts\TypeTransaction;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\Transaction;
 use Carbon\Carbon;
 use Darryldecode\Cart\CartCondition;
 use Illuminate\Http\Request;
@@ -148,6 +152,7 @@ class Api extends Controller
         if ($data["additional_info"][0] !== "Cashbon"){
             $info = "Pembayaran Lunas Dengan Metode Pembayaran ".$data["additional_info"][0];
             $status = StatusOrder::PAYMENT_CONFIRMED;
+
         }
         unset($data["additional_info"]);
         $data["user_id"] = $user_id;
@@ -176,6 +181,18 @@ class Api extends Controller
                 $makeItems = OrderItem::create($product);
             }
             if ($makeItems){
+                if ($status == StatusOrder::PAYMENT_CONFIRMED){
+                    $transaction = [
+                        "ref_type"=>RefType::ORDER,
+                        "ref_id"=>$ord_id,
+                        "total"=>$data["total"],
+                        "descriptions"=>"Dana Dari No Faktur :".$data["invoice_number"],
+                        "user_id"=>$user_id,
+                        "type"=>TypeTransaction::IN,
+                        "status"=>StatusTransaction::CONFIRMED,
+                    ];
+                    Transaction::create($transaction);
+                }
                 Cart::session($user_id)->clear();
                 Cart::session($user_id)->clearCartConditions();
                 return  response()->json(["msg"=>"Order Telah Di Selesaikan","url"=>route("orders.print.faktur")."?order_id=$ord_id"]);

@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers\Orders;
 
+use App\Casts\RefType;
 use App\Casts\StatusOrder;
+use App\Casts\StatusTransaction;
+use App\Casts\TypeTransaction;
 use App\ClassesRule\CRUDInterface;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderCashbon;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Konekt\PdfInvoice\InvoicePrinter;
@@ -105,6 +109,18 @@ class Selling extends Controller
 
         $make = OrderCashbon::create($data);
         if ($make){
+            $update = Order::where(["id"=>$req->order_id]);
+            $transaction = [
+                "ref_type"=>RefType::ORDER,
+                "ref_id"=>$req->order_id,
+                "total"=>$data["total"],
+                "descriptions"=>"Pembayaran Order Sebagian di Nota Faktur :".$update->first()->invoice_number,
+                "user_id"=>session()->get("id"),
+                "type"=>TypeTransaction::IN,
+                "status"=>StatusTransaction::CONFIRMED,
+            ];
+            Transaction::create($transaction);
+
             if ($req->has("paided")){
                 Order::where(["id"=>$req->order_id])->update(["status"=>StatusOrder::PAYMENT_CONFIRMED]);
                 return response()->json(["msg"=>"Sukses Input Cashbon","reload"=>true]);
@@ -125,8 +141,21 @@ class Selling extends Controller
             "status"=>"required"
         ]);
 
-        $update = Order::where(["id"=>$req->order_id])->update(["status"=>$req->status]);
-        if ($update){
+        $update = Order::where(["id"=>$req->order_id]);
+        $saveUpdate = $update->update(["status"=>$req->status]);;
+        if ($saveUpdate){
+            if ($req->status == StatusOrder::CANCELED){
+                $transaction = [
+                    "ref_type"=>RefType::ORDER,
+                    "ref_id"=>$req->order_id,
+                    "total"=>$update->first()->total,
+                    "descriptions"=>"Order Di Batalkan Dari No Faktur :".$update->first()->invoice_number,
+                    "user_id"=>session()->get("id"),
+                    "type"=>TypeTransaction::OUT,
+                    "status"=>StatusTransaction::CONFIRMED,
+                ];
+                Transaction::create($transaction);
+            }
             return response()->json(["msg"=>"Status Order Berubah : ".StatusOrder::lang($req->status)]);
         }else{
             return response()->json(["msg"=>"Status Gagal Di Ubah : ".StatusOrder::lang($req->status)]);
