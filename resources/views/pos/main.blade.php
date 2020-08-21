@@ -168,7 +168,7 @@
             $("#listProduk").html("");
             const produk = function (data) {
                 let build = [
-                    '<div class="col-12 col-sm-8 col-md-6 col-lg-4">',
+                    '<div class="col-12 col-sm-8 col-md-6 col-lg-6">',
                     '<div class="card">',
                     '<div class="card-img-overlay d-flex justify-content-end">',
                     '<a type="button" data-id="'+data.id+'"  class="card-link text-success add_to_cart">',
@@ -178,7 +178,7 @@
                     '<div class="card-body">',
                     '<h4 class="card-title">'+data.name+'</h4>',
                     '<div class="card-text ">',
-                    '<table class="table-bordered table mt-5">',
+                    '<table class="table-bordered table mt-5 ">',
                     '<tr>',
                     '<th>Harga</th>',
                     '<th>Stock</th>',

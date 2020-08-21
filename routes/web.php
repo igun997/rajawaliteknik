@@ -84,19 +84,19 @@ Route::middleware("gateway:1")->prefix("pos")->namespace("POS")->name("pos.")->g
 Route::middleware("gateway:0|1|2")->prefix("laporan")->namespace("Laporan")->name("laporan.")->group(function (){
     Route::get("/","Main@index")->name("menus");
     //Sub Module Laporan >  laporan.keuangan
-    Route::prefix("keuangan")->middleware("gateway:0|2|1")->name("keuangan.")->group(function (){
+    Route::prefix("keuangan")->name("keuangan.")->group(function (){
         Route::get("/","Keuangan@index")->name("home");
         Route::get("/generate/excel","Keuangan@generate_excel")->name("excel");
         Route::get("/generate/pdf","Keuangan@generate_pdf")->name("pdf");
     });
     //Sub Module Laporan >  laporan.penjualan
-    Route::prefix("penjualan")->middleware("gateway:0|1")->name("penjualan.")->group(function (){
+    Route::prefix("penjualan")->name("penjualan.")->group(function (){
         Route::get("/","Penjualan@index")->name("home");
         Route::get("/generate/excel","Penjualan@generate_excel")->name("excel");
         Route::get("/generate/pdf","Penjualan@generate_pdf")->name("pdf");
     });
     //Sub Module Laporan >  laporan.pelanggan
-    Route::prefix("pelanggan")->middleware("gateway:0|1")->name("pelanggan.")->group(function (){
+    Route::prefix("pelanggan")->name("pelanggan.")->group(function (){
         Route::get("/","Pelanggan@index")->name("home");
         Route::get("/generate/excel","Pelanggan@generate_excel")->name("excel");
         Route::get("/generate/pdf","Pelanggan@generate_pdf")->name("pdf");

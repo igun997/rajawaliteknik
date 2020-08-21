@@ -26,6 +26,7 @@ class Gateway
 
         }else{
             $exploded = explode("|",$is_must);
+
             if (in_array($level,$exploded)){
                 $is_must = $level;
                 Event::listen("JeroenNoten\LaravelAdminLte\Events\BuildingMenu",function ($e){
