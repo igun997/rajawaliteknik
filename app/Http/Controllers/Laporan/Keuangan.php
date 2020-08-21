@@ -17,15 +17,76 @@ class Keuangan extends Controller
 {
     public function index()
     {
+        $status = [];
+        $status[] = [
+            "name"=>"Semua",
+            "value"=>-1,
+        ];
+        $status[] = [
+            "name"=>StatusTransaction::lang(StatusTransaction::CONFIRMED),
+            "value"=>StatusTransaction::CONFIRMED,
+        ];
+        $status[] = [
+            "name"=>StatusTransaction::lang(StatusTransaction::REJECTED),
+            "value"=>StatusTransaction::REJECTED,
+        ];
+        $status[] = [
+            "name"=>StatusTransaction::lang(StatusTransaction::WAITING_CONFIRMATION),
+            "value"=>StatusTransaction::WAITING_CONFIRMATION,
+        ];
+
+        $type = [];
+        $type[] = [
+            "name"=>"Semua",
+            "value"=>-1,
+        ];
+        $type[] = [
+            "name"=>TypeTransaction::lang(TypeTransaction::IN),
+            "value"=>TypeTransaction::IN,
+        ];
+        $type[] = [
+            "name"=>TypeTransaction::lang(TypeTransaction::OUT),
+            "value"=>TypeTransaction::OUT,
+        ];
+
+        $ref_type = [];
+        $ref_type[] = [
+            "name"=>"Semua",
+            "value"=>-1,
+        ];
+        $ref_type[] = [
+            "name"=>RefType::lang(RefType::CASHBON),
+            "value"=>RefType::CASHBON,
+        ];
+        $ref_type[] = [
+            "name"=>RefType::lang(RefType::ORDER),
+            "value"=>RefType::ORDER,
+        ];
+        $ref_type[] = [
+            "name"=>RefType::lang(RefType::PURCHASE),
+            "value"=>RefType::PURCHASE,
+        ];
+
+
+
+
+
+
         return view("laporan.keuangan",[
             "title"=>"Laporan Keuangan",
+            "status"=>$status,
+            "type"=>$type,
+            "ref"=>$ref_type,
         ]);
     }
     public function generate_pdf(Request $req)
     {
         $req->validate([
             "from"=>"required",
-            "to"=>"required"
+            "to"=>"required",
+            "status"=>"required",
+            "type"=>"required",
+            "ref"=>"required",
         ]);
 
 
@@ -35,8 +96,18 @@ class Keuangan extends Controller
             'Periode ' => date("d/m/Y",strtotime($req->from)) . ' - ' . date("d/m/Y",strtotime($req->to))
         ];
 
-        $queryBuilder = Transaction::whereBetween('created_at', [$req->from, $req->to])
-            ->orderBy("created_at","DESC");
+        $queryBuilder = Transaction::whereBetween('created_at', [$req->from, $req->to]);
+
+        if ($req->status != -1){
+            $queryBuilder->where(["status"=>$req->status]);
+        }
+        if ($req->type != -1){
+            $queryBuilder->where(["type"=>$req->type]);
+        }
+        if ($req->ref != -1){
+            $queryBuilder->where(["ref_type"=>$req->ref]);
+        }
+        $queryBuilder->orderBy("created_at","DESC");
 
         $columns = [ // Set Column to be displayed
             'Sumber Dana' => function($res){
@@ -55,7 +126,7 @@ class Keuangan extends Controller
                 }
             },
             "Total"=>function($res){
-                return number_format($res->total);
+                return ($res->total);
             },
             "Staff"=>function($res){
                 return  $res->user->name;
@@ -70,7 +141,7 @@ class Keuangan extends Controller
             'Dibuat'=>'created_at',
         ];
 
-        return PdfReport::of($title, $meta, $queryBuilder, $columns)->setOrientation('landscape')->download("keuangan_".time());
+        return PdfReport::of($title, $meta, $queryBuilder, $columns)->showTotal(["Total"=>"point"])->setOrientation('landscape')->download("keuangan_".time());
 
 
     }
@@ -78,7 +149,10 @@ class Keuangan extends Controller
     {
         $req->validate([
             "from"=>"required",
-            "to"=>"required"
+            "to"=>"required",
+            "status"=>"required",
+            "type"=>"required",
+            "ref"=>"required",
         ]);
 
 
@@ -88,8 +162,18 @@ class Keuangan extends Controller
             'Periode ' => date("d/m/Y",strtotime($req->from)) . ' - ' . date("d/m/Y",strtotime($req->to))
         ];
 
-        $queryBuilder = Transaction::whereBetween('created_at', [$req->from, $req->to])
-            ->orderBy("created_at","DESC");
+        $queryBuilder = Transaction::whereBetween('created_at', [$req->from, $req->to]);
+
+        if ($req->status != -1){
+            $queryBuilder->where(["status"=>$req->status]);
+        }
+        if ($req->type != -1){
+            $queryBuilder->where(["type"=>$req->type]);
+        }
+        if ($req->ref != -1){
+            $queryBuilder->where(["ref_type"=>$req->ref]);
+        }
+        $queryBuilder->orderBy("created_at","DESC");
 
         $columns = [ // Set Column to be displayed
             'Sumber Dana' => function($res){
@@ -122,7 +206,7 @@ class Keuangan extends Controller
             'Dibuat'=>'created_at',
         ];
 
-        return ExcelReport::of($title, $meta, $queryBuilder, $columns)->setOrientation('landscape')->download("penjualan_".time());
+        return ExcelReport::of($title, $meta, $queryBuilder, $columns)->showTotal(["Total"=>"point"])->setOrientation('landscape')->download("penjualan_".time());
 
 
     }

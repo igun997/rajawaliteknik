@@ -31,6 +31,14 @@
                                 <option value="{{route("laporan.penjualan.excel")}}">Excel</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label>Status Laporan</label>
+                            <select id="status" class="form-control">
+                                @foreach($data as $row)
+                                    <option value="{{$row["value"]}}">{{$row["name"]}}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
                         <div class="form-group">
                             <button type="submit" class="btn btn-success block">Hasilkan</button>
@@ -54,7 +62,8 @@
         });
         $("form").on("submit",function () {
             path = $("#jenis").val();
-            location.href = path+"?from="+$("input[name=from]").val()+"&to="+$("input[name=to]").val();
+            status = $("#status").val();
+            location.href = path+"?from="+$("input[name=from]").val()+"&status="+status+"&to="+$("input[name=to]").val();
         });
     </script>
 @stop

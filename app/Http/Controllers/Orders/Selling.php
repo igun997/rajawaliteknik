@@ -116,7 +116,7 @@ class Selling extends Controller
         if ($make){
             $update = Order::where(["id"=>$req->order_id]);
             $transaction = [
-                "ref_type"=>RefType::ORDER,
+                "ref_type"=>RefType::CASHBON,
                 "ref_id"=>$req->order_id,
                 "total"=>$data["total"],
                 "descriptions"=>"Pembayaran Order Sebagian di Nota Faktur :".$update->first()->invoice_number,

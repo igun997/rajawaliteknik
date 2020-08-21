@@ -44,6 +44,8 @@ class RefType implements CastsAttributes
             return "Order";
         }elseif ($type == RefType::PURCHASE){
             return "Purchase Order";
+        }elseif ($type == RefType::CASHBON){
+            return "Cashbon";
         }else{
             return  FALSE;
         }
