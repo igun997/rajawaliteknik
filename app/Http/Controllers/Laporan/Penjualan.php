@@ -10,6 +10,12 @@ use PdfReport;
 use ExcelReport;
 class Penjualan extends Controller
 {
+    public function index()
+    {
+        return view("laporan.penjualan",[
+            "title"=>"Laporan Penjualan"
+        ]);
+    }
     public function generate_pdf(Request $req)
     {
         $req->validate([

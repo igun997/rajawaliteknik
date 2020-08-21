@@ -15,6 +15,12 @@ use PdfReport;
 use ExcelReport;
 class Keuangan extends Controller
 {
+    public function index()
+    {
+        return view("laporan.keuangan",[
+            "title"=>"Laporan Keuangan",
+        ]);
+    }
     public function generate_pdf(Request $req)
     {
         $req->validate([
@@ -102,7 +108,7 @@ class Keuangan extends Controller
                 }
             },
             "Total"=>function($res){
-                return number_format($res->total);
+                return ($res->total);
             },
             "Staff"=>function($res){
                 return  $res->user->name;

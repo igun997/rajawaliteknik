@@ -49,7 +49,7 @@ Route::middleware("gateway:1")->prefix("produk")->namespace("Produk")->name("pro
     });
 });
 //Modul Orders > orders.
-Route::middleware("gateway:1")->prefix("orders")->namespace("Orders")->name("orders.")->group(function (){
+Route::middleware("gateway:1|2")->prefix("orders")->namespace("Orders")->name("orders.")->group(function (){
     Route::get("/","Selling@index")->name("list");
     Route::get("/update_status","Selling@update_status")->name("update_status");
 
@@ -57,10 +57,10 @@ Route::middleware("gateway:1")->prefix("orders")->namespace("Orders")->name("ord
         Route::get("invoice","Selling@print_invoice")->name("faktur");
         Route::get("shipping","Selling@print_shipping")->name("shipping");
     });
-    Route::middleware("gateway:1")->prefix("api")->name("api.")->group(function (){
+    Route::middleware("gateway:1|2")->prefix("api")->name("api.")->group(function (){
         Route::get("product","Selling@product_detail")->name("product");
         Route::get("cashbon","Selling@cashbon_detail")->name("cashbon");
-        Route::post("cashbon","Selling@cashbon_create")->name("cashbon.create");
+        Route::post("cashbon","Selling@cashbon_create")->middleware("gateway:1")->name("cashbon.create");
     });
 
 });

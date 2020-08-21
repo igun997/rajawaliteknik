@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Orders;
 
+use App\Casts\LevelAccount;
 use App\Casts\RefType;
 use App\Casts\StatusOrder;
 use App\Casts\StatusTransaction;
@@ -58,7 +59,11 @@ class Selling extends Controller
     public function index()
     {
         config::set("adminlte.sidebar_collapse",true);
+
         $data = Order::where(["user_id"=>session()->get("id")])->orderBy("id","desc")->get();
+        if (session()->get("level") != LevelAccount::SEKRETARIS){
+            $data = Order::orderBy("id","desc")->get();
+        }
         foreach ($data as $index => $datum) {
             $datum->status_lang = StatusOrder::lang($datum->status);
         }

@@ -11,6 +11,12 @@ use ExcelReport;
 
 class Pelanggan extends Controller
 {
+    public function index()
+    {
+        return view("laporan.pelanggan",[
+            "title"=>"Laporan Pelanggan"
+        ]);
+    }
     public function generate_pdf(Request $req)
     {
         $req->validate([

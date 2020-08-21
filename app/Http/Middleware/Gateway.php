@@ -77,15 +77,15 @@ class Gateway
 
                         $e->menu->add([
                             "text"=>"Penjualan",
-                            "url"=>"penjualan",
-                            "icon"=>"fa fa-file"
+                            "url"=>"orders",
+                            "icon"=>"fa fa-shopping-cart"
                         ]);
 
-                        $e->menu->add([
-                            "text"=>"Transaksi Keuangan",
-                            "url"=>"keuangan",
-                            "icon"=>"fa fa-file"
-                        ]);
+//                        $e->menu->add([
+//                            "text"=>"Transaksi Keuangan",
+//                            "url"=>"keuangan",
+//                            "icon"=>"fa fa-money-bill-wave"
+//                        ]);
 
                         $e->menu->add([
                             "text"=>"Laporan",
