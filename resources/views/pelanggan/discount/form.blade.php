@@ -17,14 +17,17 @@
                     <form action="{{$route}}" method="post">
                         @csrf
                         <div class="form-group">
-                            <label>Nama</label>
-                            <input type="text" class="form-control" name="name" value="{{@$data->name}}" required>
+                            <label>Nama Produk</label>
+                            <input type="text" class="form-control" disabled>
                         </div>
                         <div class="form-group">
-                            <label>Alamat</label>
-                            <textarea type="text" class="form-control" name="address" required>{{@$data->address}}</textarea>
+                            <label>Nama Pelanggan</label>
+                            <input type="text" class="form-control" disabled>
                         </div>
-
+                        <div class="form-group">
+                            <label>Diskon (%)</label>
+                            <input type="number" min="1" max="100" class="form-control" name="percentage_diskon">
+                        </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-success block">Simpan</button>
                         </div>
@@ -43,12 +46,6 @@
     @include("msg")
     <script>
 
-        let val = parseFloat($("input[name=discount]").val());
-        if(val > 0){
-
-        }else{
-            $("input[name=discount]").val("0");
-        }
     </script>
 @stop
 

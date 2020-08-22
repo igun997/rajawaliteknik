@@ -75,11 +75,10 @@ class Pelanggan  extends Controller implements CRUDInterface
     {
         $req->validate([
             "name"=>"required",
-            "percentage_discount"=>"numeric",
             "address"=>"required",
         ]);
         $data = $req->all();
-        $data["has_discount"] = ($data["percentage_discount"])?1:0;
+        $data["has_discount"] = 0;
         $data["status"] = StatusCustomer::ACTIVE;
 
         $make = Customer::create($data);

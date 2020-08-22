@@ -14,16 +14,14 @@
                     <div class="card-title">{{$title}}</div>
                 </div>
                 <div class="card-body">
-                    <a href="{{route("pelanggan.add")}}" class="btn btn-success mb-2">Tambah Pelanggan</a>
+                    <a href="{{route("pelanggan.diskon.add",$id)}}" class="btn btn-success mb-2">Tambah Diskon</a>
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Nama</th>
-                                <th>Alamat</th>
+                                <th>Nama Produk</th>
                                 <th>Diskon</th>
-                                <th>Status</th>
                                 <th>Dibuat</th>
                                 <th>Diubah</th>
                                 <th>Aksi</th>
@@ -33,14 +31,12 @@
                             @foreach($data as $key => $row)
                                 <tr>
                                     <td>{{($key+1)}}</td>
-                                    <td>{{$row->name}}</td>
-                                    <td>{{$row->address}}</td>
-                                    <td align="center">{!! ($row->has_discount)?"<span class='badge badge-success'>".$row->percentage_discount." %</span>":"<span class='badge badge-danger'>Tidak Ada</span>" !!}</td>
-                                    <td>{{$row->status_lang}}</td>
+                                    <td>{{$row->product->name}}</td>
+                                    <td>{{$row->percentage_discount}}</td>
                                     <td>{{date("d-m-Y",strtotime($row->created_at))}}</td>
                                     <td>{{($row->updated_at)?date("d-m-Y",strtotime($row->updated_at)):null}}</td>
                                     <td>
-                                        <a href="{{route("pelanggan.update",$row->id)}}" class="btn btn-warning mb-2">
+                                        <a href="{{route("pelanggan.discount.update",$row->id)}}" class="btn btn-warning mb-2">
                                             <li class="fa fa-edit"></li>
                                         </a>
                                     </td>
