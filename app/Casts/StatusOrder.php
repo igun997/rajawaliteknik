@@ -59,7 +59,7 @@ class StatusOrder implements CastsAttributes
         }elseif ($type == StatusOrder::CANCELED){
             return "Pesanan Di Batalkan";
         }elseif ($type == StatusOrder::CASHBON){
-            return "Pesanan Belum Lunas";
+            return "Pembayaran Credit Di Konfirmasi";
         }else{
             return  FALSE;
         }

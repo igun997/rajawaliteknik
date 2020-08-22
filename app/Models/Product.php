@@ -18,13 +18,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $size_id
  * @property float $price
  * @property float $stock
- * @property int $status
+ * @property bool $status
  * @property int $user_id
  * @property Carbon $created_at
  * @property Carbon|null $updated_at
  * 
  * @property ProductSize $product_size
  * @property User $user
+ * @property Collection|CustomerDiscount[] $customer_discounts
  * @property Collection|OrderItem[] $order_items
  * @property Collection|PurchaseItem[] $purchase_items
  *
@@ -59,6 +60,11 @@ class Product extends Model
 	public function user()
 	{
 		return $this->belongsTo(User::class);
+	}
+
+	public function customer_discounts()
+	{
+		return $this->hasMany(CustomerDiscount::class);
 	}
 
 	public function order_items()

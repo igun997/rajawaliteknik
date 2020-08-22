@@ -8,6 +8,7 @@ use App\Casts\StatusTransaction;
 use App\Casts\TypeTransaction;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\CustomerDiscount;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -53,18 +54,31 @@ class Api extends Controller
 
     }
 
-    private function _add($session,$id):void
+    private function _add($session,$id,$qty,$customer_id):void
     {
+        $discount = [];
+        $disc = CustomerDiscount::where(["customer_id"=>$customer_id,"product_id"=>$id]);
+        if ($disc->count() > 0){
+            $product = $disc->first();
+            $diskon = $disc->first()->percentage_discount;
+            $discount = new CartCondition([
+                'name' => 'Membership Discount '.$diskon.'%',
+                'type' => 'promo',
+                'value' => '-'.$diskon.'%',
+            ]);
+        }
         $product = Product::findOrFail($id);
+
         Cart::session($session)->add(array(
             'id' => $product->id,
             'name' => $product->name,
             'price' => $product->price,
-            'quantity' => 1,
+            'quantity' => $qty,
             'attributes' => [
                 "size"=>$product->product_size->first()
             ],
-            'associatedModel' => $product
+            'associatedModel' => $product,
+            'conditions'=>$discount
         ));
 
     }
@@ -82,19 +96,33 @@ class Api extends Controller
     {
         $session = session()->get("id");
         $items = Cart::session($session)->getContent();
-        return response()->json(["data"=>$items,"total"=>Cart::session($session)->getTotal(),"discount"=>Cart::session($session)->getConditions()]);
+        $discount = [];
+        foreach ($items as $data){
+            if (isset($data->conditions->parsedRawValue)){
+                $discount[] = "Diskon ".(($data->conditions->parsedRawValue*100)/$data->price)."% (".$data->name.")";
+            }
+        }
+        return response()->json(["data"=>$items,"total"=>Cart::session($session)->getTotal(),"discount"=>$discount]);
     }
 
     public function add_cart(Request $req)
     {
         $req->validate([
             "product_id"=>"required|exists:products,id",
+            "qty"=>"required",
+            "customer_id"=>"required|exists:customers,id",
         ]);
 
         $session = session()->get("id");
-        $id = $req->product_id;
-        $this->_add($session,$id);
-        return response()->json(["msg"=>"Sukses Di Tambahkan"]);
+        $stock = Product::where(["id"=>$req->product_id])->first()->stock;
+        if ($stock >= ($req->qty + $this->stockOnCart($session,$req->product_id))){
+            $id = $req->product_id;
+            $this->_add($session,$id,$req->qty,$req->customer_id);
+            return response()->json(["msg"=>"Telah Di Tambahkan","code"=>200]);
+        }else{
+            return response()->json(["msg"=>"Maaf Stock Tidak Mencukupi ","code"=>404]);
+        }
+
     }
 
     public function clear_cart()
@@ -159,9 +187,12 @@ class Api extends Controller
         $data["status"] = $status;
         $data["additional_info"] = $info;
         $data["total"] = str_replace(",","",Cart::session($user_id)->getTotal());
-        $diskons = Cart::session($user_id)->getConditions();
+        $data["discount"] = 0;
+        $diskons = Cart::session($user_id)->getContent();;
         foreach ($diskons as $index => $diskon) {
-            $data["discount"] = $diskon->parsedRawValue;
+            if (isset($diskon->conditions->parsedRawValue)){
+                $data["discount"] = $data["discount"] + ($diskon->conditions->parsedRawValue*$diskon->quantity);
+            }
         }
         $num = Order::whereDate('created_at', Carbon::today())->count() + 1;
         $data["invoice_number"] = "ORD/".date("d/m/Y")."/".str_pad($num,5,0,STR_PAD_LEFT);
@@ -171,14 +202,24 @@ class Api extends Controller
             $lists = Cart::session($user_id)->getContent();
             $makeItems = false;
             foreach ($lists as $index => $list) {
+                $diskonPcs = 0;
+                if (isset($list->conditions->parsedRawValue)){
+                    $diskonPcs = $list->conditions->parsedRawValue;
+                }
                 $product = [
                     "order_id"=>$ord_id,
                     "product_id"=>$index,
+                    "total_discount"=>$diskonPcs,
                     "qty"=>$list->quantity,
-                    "price"=>$list->price,
-                    "subtotal"=>($list->quantity*$list->price),
+                    "price"=>($list->price-$diskonPcs),
+                    "subtotal"=>($list->quantity*($list->price-$diskonPcs)),
                 ];
                 $makeItems = OrderItem::create($product);
+                if ($makeItems){
+                    $now = Product::where(["id"=>$makeItems->product_id]);
+                    $stock_update = abs($now->first()->stock - $list->quantity);
+                    $now->update(["stock"=>$stock_update]);
+                }
             }
             if ($makeItems){
                 if ($status == StatusOrder::PAYMENT_CONFIRMED){
@@ -204,6 +245,16 @@ class Api extends Controller
         return  response()->json(["msg"=>"Gagal Checkout Cart"]);
 
 
+    }
+
+    private function stockOnCart($session, $product_id)
+    {
+        $lists = Cart::session($session)->getContent();
+        $stock = 0;
+        if (isset($lists[$product_id])){
+            $stock = $lists[$product_id]->quantity;
+        }
+        return $stock;
     }
 
 }

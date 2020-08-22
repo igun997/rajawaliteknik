@@ -35,12 +35,14 @@ class OrderItem extends Model
 		'product_id' => 'int',
 		'qty' => 'float',
 		'subtotal' => 'float',
+		'total_discount' => 'float',
 		'price' => 'float'
 	];
 
 	protected $fillable = [
 		'order_id',
 		'product_id',
+		'total_discount',
 		'qty',
 		'subtotal',
 		'price'

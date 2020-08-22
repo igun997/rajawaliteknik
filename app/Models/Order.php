@@ -19,6 +19,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $proof_docs
  * @property int $customer_id
  * @property int $user_id
+ * @property string|null $additional_info
+ * @property float $total
+ * @property float|null $discount
  * @property Carbon $created_at
  * @property Carbon|null $updated_at
  * 
@@ -26,7 +29,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property User $user
  * @property Collection|OrderCashbon[] $order_cashbons
  * @property Collection|OrderItem[] $order_items
- * @property Collection|Transaction[] $transactions
  *
  * @package App\Models
  */
@@ -37,18 +39,20 @@ class Order extends Model
 	protected $casts = [
 		'status' => 'int',
 		'customer_id' => 'int',
-		'user_id' => 'int'
+		'user_id' => 'int',
+		'total' => 'float',
+		'discount' => 'float'
 	];
 
 	protected $fillable = [
 		'invoice_number',
 		'status',
 		'proof_docs',
-        'total',
-        'discount',
-		'additional_info',
 		'customer_id',
-		'user_id'
+		'user_id',
+		'additional_info',
+		'total',
+		'discount'
 	];
 
 	public function customer()
@@ -69,10 +73,5 @@ class Order extends Model
 	public function order_items()
 	{
 		return $this->hasMany(OrderItem::class);
-	}
-
-	public function transactions()
-	{
-		return $this->hasMany(Transaction::class, 'ref_id');
 	}
 }

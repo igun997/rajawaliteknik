@@ -23,8 +23,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon|null $updated_at
  * @property Carbon $created_at
  * 
- * @property Order $order
- * @property Purchase $purchase
  * @property User $user
  *
  * @package App\Models
@@ -51,16 +49,6 @@ class Transaction extends Model
 		'type',
 		'status'
 	];
-
-	public function order()
-	{
-		return $this->belongsTo(Order::class, 'ref_id');
-	}
-
-	public function purchase()
-	{
-		return $this->belongsTo(Purchase::class, 'ref_id');
-	}
 
 	public function user()
 	{

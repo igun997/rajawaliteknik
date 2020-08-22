@@ -25,7 +25,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property Supplier $supplier
  * @property User $user
  * @property Collection|PurchaseItem[] $purchase_items
- * @property Collection|Transaction[] $transactions
  *
  * @package App\Models
  */
@@ -61,10 +60,5 @@ class Purchase extends Model
 	public function purchase_items()
 	{
 		return $this->hasMany(PurchaseItem::class);
-	}
-
-	public function transactions()
-	{
-		return $this->hasMany(Transaction::class, 'ref_id');
 	}
 }

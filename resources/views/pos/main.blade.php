@@ -9,7 +9,7 @@
 @section('content')
     <div class="row">
 
-        <div class="col-8">
+        <div class="col-6">
             <div class="card" style="max-height: 30em;overflow-y: scroll">
                 <div class="card-header">
                     <div class="card-title">Data Produk <button class="btn btn-primary m-2" id="reload_produk" title="Refresh Data Produk"><li class="fa fa-spinner"></li></button></div>
@@ -21,7 +21,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-4">
+        <div class="col-6">
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">Form Penjualan <button class="btn btn-primary m-2" id="reload_penjualan" title="Refresh Form Penjualan"><li class="fa fa-spinner"></li></button></div>
@@ -43,6 +43,7 @@
                                             <th>No</th>
                                             <th>Produk</th>
                                             <th>Harga</th>
+                                            <th>Diskon</th>
                                             <th>Jumlah</th>
                                             <th>Aksi</th>
                                         </tr>
@@ -68,11 +69,9 @@
                             <select name="additional_info[]" class="form-control">
                                 <option value="Cash">Cash</option>
                                 <option value="Giro">Giro</option>
-                                <option value="Cashbon">Cashbon</option>
+                                <option value="Cashbon">Credit</option>
                             </select>
                         </div>
-                        <div class="form-group" id="haveDiskon" style="text-align: center">
-                            <button class="btn btn-primary" type="button" id="setDiskon" type="submit">Tambahkan Diskon Member</button>
                         </div>
                         <div class="form-group" style="text-align: center">
                             <button class="btn btn-success" type="submit">Simpan & Cetak Faktur</button>
@@ -126,6 +125,7 @@
                         "<td>"+(num++)+"</td>",
                         "<td>"+d.name+"</td>",
                         "<td>"+formatNumber(d.price)+"</td>",
+                            "<td>"+((d.conditions.parsedRawValue)?formatNumber((d.conditions.parsedRawValue*d.quantity)):"-")+"</td>",
                         "<td>"+d.quantity+"</td>",
                         "<td><button class='btn btn-danger delete' type='button' data-link='{{route("pos.api.cart.delete")}}?product_id="+i+"'><li class='fa fa-trash'></li></button> </td>",
                         "</tr>",
@@ -135,8 +135,8 @@
                 $("#itemList").html(items.join(""));
                 $("#priceTotal").html("Rp. "+res.total);
                 $("#diskon").html("");
-                $.each(res.discount,function (d,i) {
-                    $("#diskon").html(d);
+                $.each(res.discount,function (i,d) {
+                    $("#diskon").append("<p>"+d+"</p>");
                 })
                 $("#itemList").on("click",".delete",function (e) {
                     e.preventDefault();
@@ -186,7 +186,7 @@
                     '</tr>',
                     '<tr>',
                     '<td class="text-green">'+formatNumber(data.price)+'</td>',
-                    '<td>'+((data.stock)?data.stock:'Pre Order')+'</td>',
+                    '<td>'+((data.stock)?data.stock:'<p class="text-danger">Stock Habis<p>')+'</td>',
                     '<td>'+data.size_data.name+'</td>',
                     '</tr>',
                     '</table>',
@@ -206,12 +206,22 @@
                 $("#listProduk").on("click",".add_to_cart",function (e) {
                     e.preventDefault();
                     id = $(this).data("id");
-                    $.post("{{route("pos.api.cart.add")}}",{product_id:id},function (res) {
-                        toastr.success(res.msg);
-                        location.reload();
-                    }).fail(function () {
-                        toastr.error("Terputus Dari Server");
-                    })
+                    cust_id = $("select[name=customer_id]").val();
+                    qty = prompt("Jumlah Beli");
+                    qty = parseFloat(qty);
+                    if(qty > 0){
+                        $.post("{{route("pos.api.cart.add")}}",{product_id:id,qty:qty,customer_id:cust_id},function (res) {
+                            if(res.code === 200){
+                                toastr.success(res.msg);
+                                location.reload();
+                            }else{
+                                toastr.warning(res.msg);
+                            }
+                        }).fail(function () {
+                            toastr.error("Terputus Dari Server");
+                        })
+                    }
+
                 })
             })
         }
@@ -230,15 +240,6 @@
                 },500)
 
             }).fail(function () {
-                toastr.error("Terputus Dengan Server");
-            })
-        })
-        $("#setDiskon").on("click",function () {
-            let id = $("select[name=customer_id]").val();
-            $.post("{{route("pos.api.cart.discount")}}",{customer_id:id},function (res) {
-                toastr.success(res.msg);
-                list_cart();
-            }).fail(function(){
                 toastr.error("Terputus Dengan Server");
             })
         })

@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon $created_at
  * @property Carbon|null $updated_at
  * 
+ * @property Collection|CustomerDiscount[] $customer_discounts
  * @property Collection|Order[] $orders
  *
  * @package App\Models
@@ -43,6 +44,11 @@ class Customer extends Model
 		'percentage_discount',
 		'status'
 	];
+
+	public function customer_discounts()
+	{
+		return $this->hasMany(CustomerDiscount::class);
+	}
 
 	public function orders()
 	{

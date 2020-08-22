@@ -194,11 +194,9 @@ class Selling extends Controller
             $invoice->addItem($row->product()->first()->name,"Ukuran : ".$row->product()->first()->product_size()->first()->name,$row->qty,false,$row->price,false,$row->subtotal);
         }
 
-        $invoice->addTotal("Subtotal",($find->total + $find->discount));
-        $invoice->addTotal("Diskon",($find->discount*-1));
+        $invoice->addTotal("Subtotal",$find->total);
         $invoice->addTotal("Total",$find->total,false);
 
-        $invoice->addBadge(StatusOrder::lang($find->status));
         $invoice->addTitle("Catatan Faktur");
         $invoice->addParagraph($find->additional_info);
         $invoice->render('invoice_'.time().'.pdf','D');
