@@ -31,6 +31,13 @@ Route::middleware("gateway:1")->prefix("pelanggan")->name("pelanggan.")->group(f
     Route::post("/add","Pelanggan@add_process")->name("add.process");
     Route::get("/update/{id}","Pelanggan@update")->name("update");
     Route::post("/update/{id}","Pelanggan@update_process")->name("update.process");
+    Route::prefix("discount")->name("discount.")->namespace("Pelanggan")->group(function (){
+        Route::get("/","Discount@index")->name("list");
+        Route::get("/add","Discount@add")->name("add");
+        Route::post("/add","Discount@add_process")->name("add.process");
+        Route::get("/update/{id}","Discount@update")->name("update");
+        Route::post("/update/{id}","Discount@update_process")->name("update.process");
+    });
 });
 //Modul Produk > produk.
 Route::middleware("gateway:1")->prefix("produk")->namespace("Produk")->name("produk.")->group(function (){

@@ -43,6 +43,9 @@
                                         <a href="{{route("pelanggan.update",$row->id)}}" class="btn btn-warning mb-2">
                                             <li class="fa fa-edit"></li>
                                         </a>
+                                        <a href="{{route("pelanggan.discount.list",["id"=>$row->id])}}" class="btn btn-primary mb-2">
+                                            <li class="fa fa-plus"></li>
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach
